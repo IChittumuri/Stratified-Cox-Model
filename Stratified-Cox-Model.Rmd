@@ -1,0 +1,128 @@
+---
+title: "Chittumuri_Stat755_HW5"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Documents/Hunter College/Spring 2021/Stat 755/HW")
+```
+
+The following questions consider a dataset from a study by Caplehorn et al. (“Methadone Dosage and Retention of Patients in Maintenance Treatment,” Med. J. Aust., 1991). These data comprise the times in days spent by heroin addicts from entry to departure from one of two methadone clinics. Two other covariates, namely, prison record and maximum methadone dose, are believed to affect the survival times. The dataset name is addicts.dat. A listing of the variables is given below:
+
+Column 1: Subject ID
+Column 2: Clinic (1 or 2)
+Column 3: Survival status (0 1⁄4 censored, 1 1⁄4 departed from clinic)
+Column 4: Survival time in days
+Column 5: Prison record (0 1⁄4 none, 1 1⁄4 any)
+Column 6: Maximum methadone dose (mg/day)
+
+## 1. The following edited printout was obtained from fitting a Cox PH model to these data:
+
+```{r}
+knitr::include_graphics('resources/1. Cox PH Model.png', dpi = 100)
+```
+
+Based on the P(PH) information in the above printout, it appears that clinic does not satisfy the PH assumption; this conclusion is also supported by comparing log–log curves for the two clinics and noticing strong non-parallelism. What might we learn from fitting a stratified Cox (SC) model stratifying on the clinic variable? What is a drawback to using a SC procedure that stratifies on the clinic variable?
+
+- If we fit a stratified Cox model stratifying on the clinic, we can compare adjusted survival curves for both clinic 1 and 2, whiling adjusting for prison and dose. This lets us visualize the difference the clinics survival curves. One drawback to using an SC procedure is that we cannot estimate the hazard ratio for clinic since it's included in the model. 
+
+## 2. The following printout was obtained from fitting a SC PH model to these data, where the variable being stratified is clinic:
+
+```{r echo=FALSE}
+knitr::include_graphics('resources/3. Stratified Cox PH.png', dpi = 100)
+```
+
+Using the above fitted model, we can obtain the adjusted curves below that compare the adjusted survival probabilities for each clinic (i.e., stratified by clinic) adjusted for the variables, prison and maximum methadone dose.
+
+```{r echo=FALSE}
+knitr::include_graphics('resources/2. adj-suv-cruve.png', dpi = 100)
+```
+
+Based on these adjusted survival curves, what conclusions can you draw about whether the survival experience is different between the two clinics? Explain.
+
+- The adjusted survival curve for clinic 2 is consistently higher than that of clinic 2. The difference between the two grow over time. This plot suggested that over time clinic 2 has a better survival outcome than clinic 1. 
+
+## 3. State the hazard function model being estimated in the above computer results. Why is this model a no-interaction model?
+
+$$
+\begin{aligned}
+h(t,X) = h_0(t)e^{\beta_1Prison + \beta_2Dose}, \\
+& g = 1,2
+\end{aligned}
+$$
+- This is a no-interaction model because the coefficients for the variables prison and dose are the same for each stratum
+
+## 4. Using the above computer results, provide point and interval estimates for the effect of prison adjusted for clinic and dose. Is this adjusted prison effect significant? Explain.
+
+The effect of prison adjusted for clinic and dose is 
+
+$$
+\begin{aligned}
+& \hat{HR} = 1.475 \\
+& CI = (1.059,2.054)
+\end{aligned}
+$$
+- Yes, this adjusted prison effect is significant because it has a p-value of 0.021, which is less than alpha level 0.05. 
+
+## 5. The following computer results consider a SC model that allows for interaction of the stratified variable clinic with each of the predictors, prison and dose. Product terms in the model are denoted as clinpr = clinic x prison and clindos = clinic x dose.
+
+```{r echo=FALSE}
+knitr::include_graphics('resources/5. clindos.png', dpi = 100)
+```
+
+State two alternative versions of the interaction model being estimated by the above printout, where one of these versions should involve the product terms used in the above printout.
+
+$$
+\begin{aligned}
+& Version \space 1: h(t,X) = {h_0}_g(t)e^{{\beta_1}_gPrison + {\beta_2}_gDose}, \\
+&& g = 1,2 \\
+& Version \space 2: h_g(t,X) = {h_0}_g(t)e^{{\beta_1}Prison + {\beta_2}Dose + \beta_3(CLinic*Prison) + \beta_4(Clinic*Dose)}, \\
+&& g = 1,2
+\end{aligned}
+$$
+
+## 6. Using the computer results above, determine the estimated hazard models for each clinic. (Note that the clinics are coded as 1 or 2.)
+
+$$
+\begin{aligned}
+& g = 1 (clinic \space 1) :  \\
+& h_1(t,X) = {h_0}_1(t)e^{({0.502})Prison + {(-0.036)}Dose}
+\end{aligned}
+$$
+$$
+\begin{aligned}
+& g = 2 (clinic \space 2) :  \\
+& h_2(t,X) = {h_0}_2(t)e^{({-0.083})Prison + {(-0.037)}Dose}
+\end{aligned}
+$$
+
+## 7. Below are the adjusted survival curves for each clinic based on the interaction model results above. These curves are adjusted for the prison and dose variables.
+
+```{r echo=FALSE}
+knitr::include_graphics('resources/7. inter.png', dpi = 100)
+```
+
+Compare the survival curves by clinic obtained for the interaction model with the corresponding curves previously shown for the no-interaction model. Do both graphs indicate the similar conclusions about the clinic effect? Explain.
+
+- The survival curves by clinic for both the interaction model and no-interaction model are visually the same. Therefore, both graphs indicate the same conclusion that overtime clinic 2 has a consistently and increasingly higher survival curve than that of clinic 1. This means that clinic 2 has a higher probability for survival than clinic 1. 
+
+## 8. Carry out a likelihood ratio test to determine whether the no-interaction model is appropriate. In doing so, make use of the computer information described above, state the null hypothesis, state the form of the likelihood statistic and its distribution under the null hypothesis, and compute the value of the likelihood statistic and evaluate its significance. What are your conclusions?
+
+$H_0: \beta_3 = \beta_4 = 0$
+
+$H_a: \beta_3 \ne \beta_4 \ne 0$
+
+LR:
+= $-2lnL_R - (-2lnL_F)$
+= $(-2*-597.714) - (-2*-596.779)$
+= $1195.428-1193.558 = 1.18$
+
+R refers to no-interaction model and F refers to the interaction model
+
+LR of 1.87 is approximately $\chi^2$ with 2 d.f. under $H_0$, which is not significant. Therefore, the no-interaction model is the better model.
+
+
